@@ -54,7 +54,7 @@ export class MapComponent implements OnInit, OnDestroy {
         console.log(err);
       }
     });
-  };
+  }
 
   /**
    * Apply result of the java server notification to the view.
@@ -67,7 +67,7 @@ export class MapComponent implements OnInit, OnDestroy {
         this.displayTime(receivedMsg.message);
       }
     }
-  };
+  }
 
   display(x: number, y: number, avatar: any): boolean {
     if (avatar.x === x && avatar.y === y) {
@@ -102,27 +102,30 @@ export class MapComponent implements OnInit, OnDestroy {
 
   displayAvatar(listAvatar: any): void {
     this.avatarList = (listAvatar as Avatar[]);
-    
+  }
 
+  start(): void{
+    if (this.avatarList === undefined){
+      this.avatarList = [new Avatar(1, 1, '../assets/images/avatar.png', 0)];
+    }
+
+    for (const avatar of this.avatarList){
+      console.log(avatar.positionsToGo[avatar.currentObjective]);
+      const nextPos = avatar.positionsToGo[avatar.currentObjective];
+      if (nextPos){
+        this.mapService.getPathfinding(avatar.x, avatar.y, nextPos[0], nextPos[1]).then(pos => {
+          if (pos){
+            this.updateAvatar(pos, avatar);
+          }
+        });
+      }
+    }
 
   }
 
-  start(){
-    if(this.avatarList === undefined){
-      this.avatarList = [new Avatar(1, 1, '../assets/images/avatar.png', 0)]
-    }
-
-    for(var avatar of this.avatarList){
-      console.log(avatar.positionsToGo[avatar.currentObjective])
-      var nextPos = avatar.positionsToGo[avatar.currentObjective];
-      this.mapService.getPathfinding(avatar.x, avatar.y, nextPos[0], nextPos[1]).then(pos => this.updateAvatar(pos, avatar))
-    }
-
-  }
-
-  updateAvatar(pos : any, avatar : Avatar){
-    console.log("=================")
-    if(pos.lenght == 0){
+  updateAvatar(pos: any, avatar: Avatar): void{
+    console.log('=================');
+    if (pos.length === 0){
       avatar.currentObjective++;
     }
     else{
@@ -130,7 +133,7 @@ export class MapComponent implements OnInit, OnDestroy {
       avatar.y = pos[0].y;
       this.mapService.setAvatar(this.avatarList);
     }
-    setTimeout(()=> this.start(), 1000);
+    setTimeout(() => this.start(), 1000);
 
   }
 }
