@@ -104,10 +104,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
   displayTime(second: number): void {
 
-    // if(second % 5 === 0 && second > 0){
-    //   // toggle the night
-    //   document.getElementById("journee").classList.toggle("night");
-    // }
+    if (second % 30 === 0 && second > 0){
+      // toggle the night
+      // @ts-ignore
+      document.getElementById('journee').classList.toggle('night');
+    }
 
     const hours = Math.floor(second / 60 / 60);
     const minutes = Math.floor(second / 60) - (hours * 60);
