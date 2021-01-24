@@ -3,13 +3,13 @@ import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {MapModel} from '../../model/map';
-import {Avatar} from '../../model/avatar'
+import {Avatar} from '../../model/avatar';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MapService {
-  
+
 
   constructor(private http: HttpClient) {
   }
@@ -27,8 +27,8 @@ export class MapService {
     this.http.post('http://localhost:8080​/api​/avatar​/move-avatars', avatar);
   }
 
-  getPathfinding(fromX : number, fromY : number, toX : number, toY : number){
-    var url = 'http://localhost:8080/api/map/path-finding/' + fromX + "/" + fromY + "/" + toX + "/" + toY + "/";
+  getPathfinding(objectType: number, fromX : number, fromY : number, toX : number, toY : number){
+    var url = 'http://localhost:8080/api/map/path-finding/' + objectType +'/' + fromX + "/" + fromY + "/" + toX + "/" + toY + "/";
     return this.http.get<Array<any>>(url).toPromise();;
   }
 

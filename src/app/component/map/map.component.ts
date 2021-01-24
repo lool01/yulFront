@@ -16,7 +16,10 @@ export class MapComponent implements OnInit, OnDestroy {
   public title = 'Using WebSocket under Angular';
   private obs: any;
   public timer: string | undefined;
-  public avatarList: Avatar[] = [new Avatar(1, 1, '../assets/images/avatar.png', 0)];
+  public avatarList: Avatar[] = [
+    new Avatar(1, 1, '../assets/images/avatar.png', 0, [[9, 8], [3, 21], [16, 14], [29, 22]]),
+    new Avatar(4, 1, '../assets/images/voiture.png', 1, [[29, 22]])
+  ];
   mapResponse: MapModel | undefined;
 
   constructor(private router: ActivatedRoute, private progressWebsocketService: ProgressWebsocketService, private mapService: MapService) {
@@ -108,19 +111,50 @@ export class MapComponent implements OnInit, OnDestroy {
     if (this.avatarList === undefined){
       this.avatarList = [new Avatar(1, 1, '../assets/images/avatar.png', 0)];
     }
+    this.loop();
+  }
 
+  loop() {
     for (const avatar of this.avatarList){
       console.log(avatar.positionsToGo[avatar.currentObjective]);
-      const nextPos = avatar.positionsToGo[avatar.currentObjective];
-      if (nextPos){
-        this.mapService.getPathfinding(avatar.x, avatar.y, nextPos[0], nextPos[1]).then(pos => {
-          if (pos){
-            this.updateAvatar(pos, avatar);
-          }
-        });
+      if(avatar.type === 0){
+        // Main person
+        const nextPos = avatar.positionsToGo[avatar.currentObjective];
+        if (nextPos){
+          this.mapService.getPathfinding(avatar.type, avatar.x, avatar.y, nextPos[0], nextPos[1]).then(pos => {
+            if (pos){
+              this.updateAvatar(pos, avatar);
+            }
+          });
+        }
       }
+
+      if(avatar.type === 1){
+        // Voiture
+        if(avatar.currentDirection == null){
+          // Decide a direction
+        }
+
+        var newPos = null;
+
+        if(avatar.currentDirection === 1){
+          // go up
+        }else if(avatar.currentDirection === 2){
+          // go right
+        }else if(avatar.currentDirection === 3){
+          // go down
+        }else if(avatar.currentDirection === 4){
+          // go left
+        }
+
+        if(newPos){
+
+        }
+      }
+
     }
 
+    setTimeout(() => this.loop(), 1000);
   }
 
   updateAvatar(pos: any, avatar: Avatar): void{
@@ -133,7 +167,5 @@ export class MapComponent implements OnInit, OnDestroy {
       avatar.y = pos[0].y;
       this.mapService.setAvatar(this.avatarList);
     }
-    setTimeout(() => this.start(), 1000);
-
   }
 }

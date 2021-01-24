@@ -8,13 +8,14 @@ export class Avatar {
   type: number;
   positionsToGo: any;
   currentObjective: any;
+  currentDirection = null;
 
-  constructor(x: number, y: number, image: string, type: number) {
+  constructor(x: number, y: number, image: string, type: number, positionstoGo) {
     this.image = image;
     this.x = x;
     this.y = y;
     this.type = type;
-    this.positionsToGo = [[9, 8], [3, 21], [16, 14], [29, 22]];
+    this.positionsToGo = positionstoGo;
     this.currentObjective = 0;
   }
 
