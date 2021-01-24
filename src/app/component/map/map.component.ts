@@ -17,11 +17,6 @@ export class MapComponent implements OnInit, OnDestroy {
   private obs: any;
   public timer: string | undefined;
   public avatarList: Avatar[] = [
-    new Avatar(13, 15, '../assets/images/rick.gif', 0, ["do-nothing"]),
-    new Avatar(14, 15, '../assets/images/rick.gif', 0, ["do-nothing"]),
-    new Avatar(12, 15, '../assets/images/rick.gif', 0, ["do-nothing"]),
-    new Avatar(13, 14, '../assets/images/rick.gif', 0, ["do-nothing"]),
-    new Avatar(13, 16, '../assets/images/rick.gif', 0, ["do-nothing"]),
     new Avatar(1, 29, '../assets/images/snow.png', 0, [[1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], ]), // Snow board !
     new Avatar(15, 26, '../assets/images/person.jpg', 0, [[3, 21], [16, 14], [29, 22]]),
     new Avatar(4, 1, '../assets/images/voiture.png', 1, null),
@@ -36,6 +31,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private pompierSpawned = false;
   private started = false;
+  private rickSpawned = false;
 
   constructor(private router: ActivatedRoute, private progressWebsocketService: ProgressWebsocketService, private mapService: MapService) {
     router.params.subscribe(val => {
@@ -114,6 +110,16 @@ export class MapComponent implements OnInit, OnDestroy {
       // toggle the night
       // @ts-ignore
       document.getElementById('journee').classList.toggle('night');
+    }
+
+    if (second % 15 === 0 && second > 0 && !this.rickSpawned){
+      this.avatarList.push(new Avatar(13, 15, '../assets/images/rick.gif', 0, ["do-nothing"]),
+        new Avatar(14, 15, '../assets/images/rick.gif', 0, ["do-nothing"]),
+        new Avatar(12, 15, '../assets/images/rick.gif', 0, ["do-nothing"]),
+        new Avatar(13, 14, '../assets/images/rick.gif', 0, ["do-nothing"]),
+        new Avatar(13, 16, '../assets/images/rick.gif', 0, ["do-nothing"]));
+
+      this.rickSpawned = true;
     }
 
     const hours = Math.floor(second / 60 / 60);
