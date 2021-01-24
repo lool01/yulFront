@@ -11,6 +11,7 @@ export class Avatar {
   currentDirection = null;
   isAccident = false;
 
+  // @ts-ignore
   constructor(x: number, y: number, image: string, type: number, positionstoGo) {
     this.image = image;
     this.x = x;

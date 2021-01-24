@@ -3,6 +3,23 @@
   <label>Horloge : {{timer}}</label>
 </div>
 
+<style>
+  #journee {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100vw;
+    height:100vh;
+    z-index:9999;
+  }
+
+  .nuit {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+</style>
+
+<div id="journee"></div>
+
 <div *ngIf="mapResponse != null" style="width: 2250px">
   <span *ngFor="let tabSquare of mapResponse?.square; let y = index">
     <span *ngIf="tabSquare != null">
