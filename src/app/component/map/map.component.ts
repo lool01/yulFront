@@ -18,7 +18,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public timer: string | undefined;
   public avatarList: Avatar[] = [
     new Avatar(1, 29, '../assets/images/snow.png', 0, [[1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], ]), // Snow board !
-    new Avatar(8, 0, '../assets/images/person.jpg', 0, [[9, 8], [3, 21], [16, 14], [29, 22]]),
+    new Avatar(15, 26, '../assets/images/person.jpg', 0, [[3, 21], [16, 14], [29, 22]]),
     new Avatar(4, 1, '../assets/images/voiture.png', 1, null),
     new Avatar(1, 10, '../assets/images/voiture.png', 1, null),
     new Avatar(4, 8, '../assets/images/voiture.png', 1, null),
@@ -30,6 +30,7 @@ export class MapComponent implements OnInit, OnDestroy {
   mapResponse: MapModel | undefined;
 
   private pompierSpawned = false;
+  private started = false;
 
   constructor(private router: ActivatedRoute, private progressWebsocketService: ProgressWebsocketService, private mapService: MapService) {
     router.params.subscribe(val => {
@@ -114,6 +115,11 @@ export class MapComponent implements OnInit, OnDestroy {
     const minutes = Math.floor(second / 60) - (hours * 60);
     const seconds = second % 60;
     this.timer = hours + 'h :' + minutes + 'm :' + seconds + 's';
+
+    if(!this.started){
+      this.started = true;
+      this.start();
+    }
   }
 
   displayAvatar(listAvatar: any): void {
