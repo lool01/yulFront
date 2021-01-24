@@ -17,10 +17,18 @@ export class MapComponent implements OnInit, OnDestroy {
   private obs: any;
   public timer: string | undefined;
   public avatarList: Avatar[] = [
-    new Avatar(1, 1, '../assets/images/avatar.png', 0, [[9, 8], [3, 21], [16, 14], [29, 22]]),
-    new Avatar(4, 1, '../assets/images/voiture.png', 1, [[29, 22]])
+    new Avatar(1, 1, '../assets/images/person.jpg', 0, [[9, 8], [3, 21], [16, 14], [29, 22]]),
+    new Avatar(4, 1, '../assets/images/voiture.png', 1, null),
+    new Avatar(1, 10, '../assets/images/voiture.png', 1, null),
+    new Avatar(4, 8, '../assets/images/voiture.png', 1, null),
+    new Avatar(1, 20, '../assets/images/voiture.png', 1, null),
+    new Avatar(28, 1, '../assets/images/voiture.png', 1, null),
+    new Avatar(25, 5, '../assets/images/voiture.png', 1, null),
+    new Avatar(8, 8, '../assets/images/voiture.png', 1, [[8, 21], "accident"]), // Voiture accident
   ];
   mapResponse: MapModel | undefined;
+
+  private pompierSpawned = false;
 
   constructor(private router: ActivatedRoute, private progressWebsocketService: ProgressWebsocketService, private mapService: MapService) {
     router.params.subscribe(val => {
@@ -116,45 +124,131 @@ export class MapComponent implements OnInit, OnDestroy {
 
   loop() {
     for (const avatar of this.avatarList){
-      console.log(avatar.positionsToGo[avatar.currentObjective]);
-      if(avatar.type === 0){
+      if(avatar.isAccident && !this.pompierSpawned){
+        // Spawn a pompier
+        this.avatarList.push(new Avatar(8, 1, '../assets/images/firetruck.jpg', 1, [[avatar.x, avatar.y], "save", [8, 1], "disapear"]));
+        this.pompierSpawned = true;
+      }
+
+      if(avatar.positionsToGo){
         // Main person
         const nextPos = avatar.positionsToGo[avatar.currentObjective];
-        if (nextPos){
+        if (Array.isArray(nextPos)){
           this.mapService.getPathfinding(avatar.type, avatar.x, avatar.y, nextPos[0], nextPos[1]).then(pos => {
             if (pos){
               this.updateAvatar(pos, avatar);
             }
           });
+        }else if(nextPos == "accident"){
+          avatar.image = "../assets/images/voiture-accident.png";
+          avatar.isAccident = true;
+        }else if(nextPos == "save"){
+          // save the car in fire
+          for(const avatar2 of this.avatarList){
+            if(avatar2.x == avatar.x && avatar2.y == avatar.y){
+              avatar2.isAccident = false;
+              avatar2.image = "../assets/images/voiture.png";
+              avatar2.positionsToGo = null;
+            }
+          }
+        }else if(nextPos == "disapear") {
+          // remove the avatar
+          this.avatarList.splice(this.avatarList.indexOf(avatar), 1);
+          continue;
         }
-      }
-
-      if(avatar.type === 1){
+      } else{
         // Voiture
         if(avatar.currentDirection == null){
           // Decide a direction
+          avatar.currentDirection = 3;
+        }
+
+        // If at intersection, randomly change direction
+        if(this.mapResponse.square[avatar.y][avatar.x].image === "../assets/images/croisement.png"){
+          console.log("INTERSECTION !")
+          do{
+            avatar.currentDirection = this.getRndInteger(1, 4);
+
+            var newPos = null;
+
+            if(avatar.currentDirection === 1){
+              // go up
+              newPos = [{x: avatar.x, y: avatar.y - 1}];
+            }else if(avatar.currentDirection === 2){
+              // go right
+              newPos = [{x: avatar.x + 1, y: avatar.y}];
+            }else if(avatar.currentDirection === 3){
+              // go down
+              newPos = [{x: avatar.x, y: avatar.y + 1}];
+            }else if(avatar.currentDirection === 4){
+              // go left
+              newPos = [{x: avatar.x - 1, y: avatar.y}];
+            }
+
+            // Check if positionOk
+            console.log("======= " + this.mapResponse.square[newPos[0].y][newPos[0].x].value);
+            if(this.mapResponse.square[newPos[0].y][newPos[0].x].value !== 1){
+              avatar.currentDirection = null;
+            }
+
+          }while(avatar.currentDirection == null);
         }
 
         var newPos = null;
 
         if(avatar.currentDirection === 1){
           // go up
+          newPos = [{x: avatar.x, y: avatar.y - 1}];
+          if(newPos[0].y < 0){
+            avatar.currentDirection = 3; // down
+            continue;
+          }
         }else if(avatar.currentDirection === 2){
           // go right
+          newPos = [{x: avatar.x + 1, y: avatar.y}];
+          if(newPos[0].x >= 30){
+            avatar.currentDirection = 4; // left
+            continue;
+          }
         }else if(avatar.currentDirection === 3){
           // go down
+          newPos = [{x: avatar.x, y: avatar.y + 1}];
+
+          if(newPos[0].y >= 30){
+            avatar.currentDirection = 1; // up
+            continue;
+          }
         }else if(avatar.currentDirection === 4){
           // go left
+          newPos = [{x: avatar.x - 1, y: avatar.y}];
+          if(newPos[0].y < 0){
+            avatar.currentDirection = 2; // right
+            continue;
+          }
+        }
+
+        // for(var x = 0; x < 30; x++){
+        //   console.log(this.mapResponse.square[x]);
+        // }
+
+        // Check if positionOk
+        console.log("======= " + this.mapResponse.square[newPos[0].y][newPos[0].x].value);
+        if(this.mapResponse.square[newPos[0].y][newPos[0].x].value !== 1){
+          newPos = null;
         }
 
         if(newPos){
-
+          this.updateAvatar(newPos, avatar);
         }
       }
 
     }
 
     setTimeout(() => this.loop(), 1000);
+  }
+
+  getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min) ) + min;
   }
 
   updateAvatar(pos: any, avatar: Avatar): void{

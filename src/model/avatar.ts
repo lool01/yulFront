@@ -9,6 +9,7 @@ export class Avatar {
   positionsToGo: any;
   currentObjective: any;
   currentDirection = null;
+  isAccident = false;
 
   constructor(x: number, y: number, image: string, type: number, positionstoGo) {
     this.image = image;
