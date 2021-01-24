@@ -16,7 +16,7 @@ export class MapComponent implements OnInit, OnDestroy {
   public title = 'Using WebSocket under Angular';
   private obs: any;
   public timer: string | undefined;
-  public avatarList: Avatar[] | undefined;
+  public avatarList: Avatar[] = [new Avatar(1, 1, '../assets/images/avatar.png', 0)];
   mapResponse: MapModel | undefined;
 
   constructor(private router: ActivatedRoute, private progressWebsocketService: ProgressWebsocketService, private mapService: MapService) {
@@ -93,12 +93,44 @@ export class MapComponent implements OnInit, OnDestroy {
     const minutes = Math.floor(second / 60) - (hours * 60);
     const seconds = second % 60;
     this.timer = hours + 'h :' + minutes + 'm :' + seconds + 's';
+
+    // update everything
+
+
+
   }
 
   displayAvatar(listAvatar: any): void {
     this.avatarList = (listAvatar as Avatar[]);
-    console.log(this.avatarList);
+    
+
+
   }
 
+  start(){
+    if(this.avatarList === undefined){
+      this.avatarList = [new Avatar(1, 1, '../assets/images/avatar.png', 0)]
+    }
 
+    for(var avatar of this.avatarList){
+      console.log(avatar.positionsToGo[avatar.currentObjective])
+      var nextPos = avatar.positionsToGo[avatar.currentObjective];
+      this.mapService.getPathfinding(avatar.x, avatar.y, nextPos[0], nextPos[1]).then(pos => this.updateAvatar(pos, avatar))
+    }
+
+  }
+
+  updateAvatar(pos : any, avatar : Avatar){
+    console.log("=================")
+    if(pos.lenght == 0){
+      avatar.currentObjective++;
+    }
+    else{
+      avatar.x = pos[0].x;
+      avatar.y = pos[0].y;
+      this.mapService.setAvatar(this.avatarList);
+    }
+    setTimeout(()=> this.start(), 1000);
+
+  }
 }
