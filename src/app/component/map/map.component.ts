@@ -17,6 +17,7 @@ export class MapComponent implements OnInit, OnDestroy {
   private obs: any;
   public timer: string | undefined;
   public avatarList: Avatar[] = [
+    new Avatar(1, 29, '../assets/images/snow.png', 0, [[1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], [1, 29], [1, 1], ]), // Snow board !
     new Avatar(1, 1, '../assets/images/person.jpg', 0, [[9, 8], [3, 21], [16, 14], [29, 22]]),
     new Avatar(4, 1, '../assets/images/voiture.png', 1, null),
     new Avatar(1, 10, '../assets/images/voiture.png', 1, null),
